@@ -68,38 +68,81 @@ private:
 
 int main()
 {
-    OurSet* list = new OurSet(70);
+    OurSet list = OurSet(10);
     for (int i = 0; i < 15; i += 3) {
-        list->insert(i + 7);
+        list.insert(i + 7); //insert()
     }
-    list->show_contents();
-    cout << (list != NULL) << endl;
-    cout << "This is my" << endl;
-    OurSet* list3 = new OurSet();
+    cout << "This is my constructure" << endl << endl;
+    list.show_contents();
+    OurSet list_2(list);
+    cout << "this list2 is copy constructure" << endl << endl;
+    list_2.show_contents();
+    int a = list.list_length();
+    cout << "This is list_length " << a << endl << endl;
+    cout << "list_head_insert(5)" << endl;
+    list.list_head_insert(5);
+    list.show_contents();
 
-    OurSet* list2 = new OurSet(*list3);
-    cout << "thisS@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << endl;
-    list->show_contents();
-    list->show_contents();
-    cout << "thisS@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << endl;
+    //list.list_insert(list.list_search(5), 9); // list_search(const node::value_type& target)
+    //list.show_contents();
 
-    list2->show_contents();
+    //list.list_insert(list.list_locate(3), 77); // list_locate(size_t position)
+    //list.show_contents();
 
-    cout << endl;
-    cout << endl;
-    cout << endl;
+    //cout << "This is list_head_remove " << a << endl << endl;
+    //list.list_head_remove();
+
+    //list.list_remove(list.list_locate(3));
+    //list.show_contents();
+
+    /*OurSet list3 = OurSet(130);
+    for (int i = 0; i < 15; i += 3) {
+        list3.insert(i +2);
+    }
+    list_2.list_copy(list3.list_locate(1));
+    cout << "this is list_2 copy.." << endl;*/
+    // list_2.show_contents();
+
+    //cout << "this is erase_one(): " << list_2.erase_one(10) << endl;
+    //list_2.show_contents(); // erase_one()
+
+    //cout << list_2.count(7) << endl; // count()
+
+    // operator+()
+    //cout << "this is operator+(): " << endl;
+    //list.operator+(list_2); // error
+    //list.operator+(list); // not error
+    //list.show_contents(); 
 
 
-    /*list->sort();
-    list->show_contents();*/
+    // operator+=()
+    /*cout << "this is operator+=(): " << endl;
+    list += list_2;
+    list.show_contents(); */
 
-    cout << "this" << endl;
-    cout << endl;
-    //list += list2;
-    cout << endl;
+    // operator =
+    cout << "this is operator=(): " << endl;
+    list = list_2;
+    cout << "this is list_2 contents" << endl;
+    list_2.show_contents();
+    cout << "this is list contents" << endl;
+    list.show_contents();
 
-    cout << endl;
+    // operator ==
+    cout << "this is operator==(): " << endl;
+    cout << (list == list) << endl;
+    // operator !=
+    cout << "this is operator!=(): " << endl;
+    cout << (list != list) << endl;
 
+    // sort()
+    list.sort();
+    list_2.sort();
+    cout << "list: ";
+    list.show_contents();
+    cout << "list_2: ";
+    list_2.show_contents();
+    return 0;
 }
 
 OurSet::OurSet() {
@@ -123,9 +166,11 @@ OurSet::OurSet(const OurSet& copy) {
 OurSet::~OurSet() {
     node* cur = head;
     while (cur != NULL) {
-        list_head_remove();
-
+        node* next = cur->next;
+        delete cur;
+        cur = next;
     }
+    head = NULL;
 }
 
 size_t OurSet::list_length() {
@@ -150,10 +195,6 @@ node* OurSet::list_search(const node::value_type& target) {
     {
         if (target == cursor->value)
         {
-            cout << "After: ";
-            show_contents();
-            cout << endl;
-
             return cursor;
         }
         cursor = cursor->next;
@@ -168,7 +209,6 @@ node* OurSet::list_locate(size_t position) {
         return NULL;
     }
 
-
     node* cursor = head;
     int i = 1;
     
@@ -176,9 +216,6 @@ node* OurSet::list_locate(size_t position) {
 
         if (position == i)
         {
-            cout << "After: ";
-            show_contents();
-            cout << endl;
             return cursor;
         }
         i++;
@@ -194,12 +231,13 @@ void OurSet::list_head_insert(const value_type& entry) {
     node* newnode = new node(entry); // node: prev = next = NULL;
     if (head == NULL) {
         head = newnode;
+        tail = newnode;
     }
     else {
         newnode->next = head;
         head->prev = newnode;
+        head = newnode;
     }
-    head = newnode;
     ++size;
 
 }
@@ -209,7 +247,7 @@ void OurSet::list_insert(node* previous_ptr, const value_type& entry) { //13, 10
     node* insert_ptr = new node(entry);
     node* pre = list_search(previous_ptr->value);
     if (pre == NULL) { // pre don't exit
-        cout << "previous_ptr don'y exit" << endl;
+        cout << "previous_ptr don't exit" << endl;
         return;
     }
     else { // end or mid
@@ -226,12 +264,9 @@ void OurSet::list_insert(node* previous_ptr, const value_type& entry) { //13, 10
 void OurSet::list_head_remove() {
     if (head == NULL) { // 10 -> 15 -> 13 - > 7   ->    15 -> 13 - > 7
         cout << "This OurSet is Null" << endl;
-        return;
     }
     else
     { // 10 -> 15 -> 13 - > 7   ->    15 -> 13 - > 7
-
-
         node* del = head; // 10
         head = head->next;
         if (head != NULL) {
@@ -239,7 +274,6 @@ void OurSet::list_head_remove() {
         }
         delete del;
         size--;
-
     }
 
 
@@ -259,15 +293,14 @@ void OurSet::list_remove(node* previous_ptr) { // prev 다음 번째를 지우�
 
 
         cout << "Prev(CUR) node is tail node" << endl;
-
+        return;
 
     }
     else if (cur->next->next == NULL) { // 1 - 2 - 3(c) - 4(d)
         // target이 꼬리 노드일 때
-
-
-        node* del = cur->next; 
+        node* del = tail; 
         cur->next = NULL;
+        tail = cur;
         --size;
         delete del;
 
@@ -286,15 +319,9 @@ void OurSet::list_remove(node* previous_ptr) { // prev 다음 번째를 지우�
 
 }
 void OurSet::list_clear(node*& head_ptr) {
-
-
-    node* cursor = head_ptr;
-    while (cursor != NULL) {
+    while (head_ptr != NULL) {
         list_head_remove();
-        cursor = cursor->next;
     }
-
-
 }
 void OurSet::list_copy(const node* source_ptr) { // Basic i is 1
     if (source_ptr == NULL) return;
@@ -307,7 +334,6 @@ void OurSet::list_copy(const node* source_ptr) { // Basic i is 1
     {
         source_ptr = source_ptr->next;
     }
-    source_ptr = source_ptr->next;
     while (source_ptr != NULL) {    // 10 -> 15 -> 13 - > 7
         node* newnode = new node(source_ptr->value); // node: prev = next = NULL;
         if (cphead == NULL) {
@@ -316,12 +342,12 @@ void OurSet::list_copy(const node* source_ptr) { // Basic i is 1
         else {
             newnode->next = cphead;
             cphead->prev = newnode;
+            cphead = newnode;
         }
-        cphead = newnode;
         ++size;
         source_ptr = source_ptr->prev;
     }
-
+    head = cphead; tail = cptail;
 }
 
 void OurSet::insert(const value_type& entry) {
@@ -345,10 +371,6 @@ bool OurSet::erase_one(const value_type& target) {
 
     }
     else { // 중간이면 head부분을 빠질 부분으로 넣고 head을 재설정 해준다 1 - 5 - 6 - 2
-        cout << "Befor: ";
-        show_contents();
-        cout << endl;
-
         node* cur = head;
         while (cur != NULL) {    // 10 -> 15 -> 13 - > 7
             if (cur == target_ptr) {
@@ -357,10 +379,6 @@ bool OurSet::erase_one(const value_type& target) {
             }
             cur = cur->next;
         }
-
-        cout << "After: ";
-        show_contents();
-        cout << endl;
     }
     return true;
 };
@@ -395,14 +413,9 @@ int OurSet::count(const value_type& target) const {
 
 void OurSet::operator+(const OurSet& addend) {
     //1 - 2 - 3  + 6 - 5 - 8
-    if (addend.size != this->size) {
-        return;
-    }
-    else if (addend.size <= 0 || 0 >= this->size) { //head = tail = NULL
-        return;
-    }
-    else { // addend.size == this->size
-  
+    if (addend.size == this->size) {
+        // addend.size == this->size
+
         node* cur = head;
         node* cur2 = addend.head;
         while (cur != NULL)
@@ -417,7 +430,9 @@ void OurSet::operator+(const OurSet& addend) {
             cur = cur->next;
             cur2 = cur2->next;
         }
-  
+    }
+    else {
+        cout << "Unknown Error!" << endl;
     }
 
 }
@@ -457,7 +472,10 @@ void OurSet:: operator=(const OurSet& addend) {
 }
 
 bool OurSet:: operator==(const OurSet& addend) {
-    if (this == &addend) return true;
+    if (this == &addend) {
+        cout << "This is same address" << endl;
+        return true;
+    }
     else {
         node* cursor = head;
         node* add = addend.head;
@@ -466,12 +484,12 @@ bool OurSet:: operator==(const OurSet& addend) {
             cursor = cursor->next;
             add = add->next;
         }
+        cout << "This is same values" << endl;
         return true;
     }
 
 }
 bool OurSet:: operator!=(const OurSet& addend) {
-    show_contents();
     if (this == &addend) return false;
     else {
         node* cursor = head;
@@ -481,6 +499,8 @@ bool OurSet:: operator!=(const OurSet& addend) {
             cursor = cursor->next;
             add = add->next;
         }
+        cout << "This is same values" << endl;
+
         return false;
     }
 }
